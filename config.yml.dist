@@ -1,0 +1,5 @@
+# taxonomylist settings
+
+template: assets/taxonomylist.twig
+
+default_taxonomy: tags

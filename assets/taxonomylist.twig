@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>{{ __('Taxonomies') }}</title>
+</head>
+<body>
+    <h1>{{ __('Taxonomies') }}</h1>
+    <ul>
+    {% for type in taxonomies %}
+        <h3>{{ type }}</h3>
+        {% set list = taxonomylist(type, true) %}
+
+        {% if list %}
+        <ul>
+            {% for item in list %}
+            <li>
+                <a class="taxonomy-{{ item.slug }}" href="{{ item.link }}" title="{{ item.name }}">
+                    {{ item.name }}
+                    <small>[ {{ item.count }} ]</small>
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    {% endfor %}
+
+</body>
+</html>
