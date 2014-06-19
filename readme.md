@@ -3,7 +3,7 @@ TaxonomyList
 
 This extension adds a twig tag for Taxonomy Listings.
 
-Usage with quick lookup:
+The quick lookup only reads the taxonomy config and does not count items in the database. Usage with quick lookup:
 
     {% set list = taxonomylist('categories') %}
     <ul>
@@ -16,7 +16,7 @@ Usage with quick lookup:
     {% endfor %}
     </ul>
 
-Usage with full lookup:
+The full lookup counts all items in the database for each category and returns this in ``{{ item.count }}``. Usage with full lookup:
 
     {% set list = taxonomylist('categories', true) %}
     <ul>
@@ -30,16 +30,19 @@ Usage with full lookup:
     {% endfor %}
     </ul>
 
-Limit and weight with full lookup (it does not make sense to do a quick lookup with weighted tags, or limits):
+Usage with limit and weight in a full lookup (it does not make sense to do a quick lookup with weighted tags, or limits):
 
     {% set list = taxonomylist('categories', { 'limit': 10, 'weighted': true } ) %}
     <nav class="tags">
     {% for item in list %}
-            <a class="taxonomy-{{ item.slug }} weight-{{ item.weight }}" href="{{ item.link }}" title="{{ item.name }}">
+            <a class="taxonomy-{{ item.slug }} weight-{{ item.weightclass }}" href="{{ item.link }}" title="{{ item.name }}">
                 {{ item.name }}
-                <small>{{ item.count }}</small>
+                <small>{{ item.count }} items</small>
             </a>
     {% endfor %}
     </nav>
 
-Weighted will return the tags with the most matches first, unweighted will return the tags in the original sortorder.
+Weighted will return the tags with the most matches first, unweighted will return the tags in the original sortorder. Taxonomy terms without any records in the database will not be returned.
+
+The weighted query also returns ``{{ item.weight }}`` and ``{{ item.weightclass }}``. The ``{{ item.weight }}`` is a percentage.
+The ``{{ item.weightclass }}`` is one of xl, x, m, s, xs.
