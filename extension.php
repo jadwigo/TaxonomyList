@@ -22,12 +22,12 @@ class Extension extends \Bolt\BaseExtension
             'description' => "An extension that adds a twig tag for Taxonomy Listings.",
             'author' => "Lodewijk Evers",
             'link' => "http://bolt.cm",
-            'version' => "0.1",
+            'version' => "0.2",
             'required_bolt_version' => "1.6.5",
             'highest_bolt_version' => "1.6.5",
             'type' => "General",
             'first_releasedate' => "2014-06-06",
-            'latest_releasedate' => "2014-06-06",
+            'latest_releasedate' => "2014-06-19",
             'dependencies' => "",
             'priority' => 10
         );
@@ -75,7 +75,7 @@ class Extension extends \Bolt\BaseExtension
     /**
      * Return an array with items in a taxonomy
      */
-    function twigTaxonomyList($name = false, $full = false) {
+    function twigTaxonomyList($name = false, $params = false) {
 
         // if $name isn't set, use the one from the config.yml. Unless that's empty too, then use "tags".
         if (empty($name)) {
@@ -91,8 +91,8 @@ class Extension extends \Bolt\BaseExtension
 
         if(array_key_exists($name, $taxonomy)) {
             $named = $taxonomy[$name];
-            if($full != false) {
-                $named = $this->getFullTaxonomy($name, $taxonomy);
+            if($params != false) {
+                $named = $this->getFullTaxonomy($name, $taxonomy, $params);
             }
             if(array_key_exists('options', $named)) {
                 // \Dumper::dump($named);
@@ -114,8 +114,13 @@ class Extension extends \Bolt\BaseExtension
                         'link' => $itemlink,
                         'count' => $itemcount,
                     );
+                    if($item['weight']>=0) {
+                        $options[$slug]['weight'] = $item['weight'];
+                        $options[$slug]['weightclass'] = $item['weightclass'];
+                    }
                 }
-                //krumo($options);
+                // \Dumper::dump($named);
+                // \Dumper::dump($options);
                 return $options;
             }
         }
@@ -127,32 +132,86 @@ class Extension extends \Bolt\BaseExtension
     /**
      * Get the full taxonomy data from the database, count all occurences of a certain taxonomy name
      */
-    function getFullTaxonomy($name = null, $taxonomy = null) {
+    function getFullTaxonomy($name = null, $taxonomy = null, $params = null) {
 
         if(array_key_exists($name, $taxonomy)) {
             $named = $taxonomy[$name];
 
-            // \Dumper::dump($name, $named);
-            // \Dumper::dump($this->app['config']);
-            $prefix = $this->app['config']->get('general/database/prefix', 'bolt_');
+            // default params
+            $limit = $weighted = false;
+            if(isset($params['limit']) && is_numeric($params['limit'])) {
+                $limit = $params['limit'];
+            }
+            if(isset($params['weighted']) && $params['weighted']==true) {
+                $weighted = true;
+            }
 
+            $prefix = $this->app['config']->get('general/database/prefix', 'bolt_');
             $tablename = $prefix . "taxonomy";
 
-            // \Dumper::dump($tablename);
+            // type of sort depending on params
+            if($weighted) {
+                $sortorder = 'count DESC';
+            } else {
+                $sortorder = 'sortorder ASC';
+            }
 
+            // the normal query
             $query = sprintf(
-                "SELECT COUNT(name) as count, slug, name FROM %s WHERE taxonomytype IN ('%s') GROUP BY name ORDER BY sortorder ASC",
+                "SELECT COUNT(name) as count, slug, name FROM %s WHERE taxonomytype IN ('%s') GROUP BY name ORDER BY %s",
                 $tablename,
-                $name
+                $name,
+                $sortorder
             );
-            // \Dumper::dump($query);
 
-            // \Dumper::dump($this->app['db']);
+            // append limit to query the parameter is set
+            if($limit) {
+                $query .= sprintf(' LIMIT 0, %d', $limit);
+            }
+
+            // fetch results from db
             $rows = $this->app['db']->executeQuery( $query )->fetchAll();
 
-            // \Dumper::dump($rows);
+            if($rows && ($weighted || $limit)) {
+                // find the max / min for the results
+                $named['maxcount'] = 0;
+                $named['number_of_tags'] = count($named['options']);
+                foreach($rows as $row) {
+                    if($row['count']>=$named['maxcount']) {
+                        $named['maxcount']= $row['count'];
+                    }
+                    if(!isset($named['mincount']) || $row['count']<=$named['mincount']) {
+                        $named['mincount']= $row['count'];
+                    }
+                }
 
-            if($rows) {
+                $named['deltacount'] = $named['maxcount'] - $named['mincount'] + 1;
+                $named['stepsize'] = $named['deltacount'] / 5;
+
+                // return only rows with results
+                $populatedrows = array();
+                foreach($rows as $row) {
+                    $row['weightpercent'] = ($row['count'] - $named['mincount']) / ($named['maxcount'] - $named['mincount']);
+                    $row['weight'] = round($row['weightpercent'] * 100);
+
+                    if($row['weight']<=20) {
+                        $row['weightclass'] = 'xs';
+                    } elseif($row['weight']<=40) {
+                        $row['weightclass'] = 's';
+                    } elseif($row['weight']<=60) {
+                        $row['weightclass'] = 'm';
+                    } elseif($row['weight']<=80) {
+                        $row['weightclass'] = 'l';
+                    } else {
+                        $row['weightclass'] = 'xl';
+                    }
+
+                    $populatedrows[$row['slug']] = $row;
+                }
+                $named['options'] = $populatedrows;
+            } elseif($rows) {
+                // return all rows - so add the count to all existing rows
+                // weight is useless here
                 foreach($rows as $row) {
                     $named['options'][$row['slug']] = $row;
                 }
