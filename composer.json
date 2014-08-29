@@ -1,5 +1,5 @@
 {
-    "name": "bolt/taxonomylist",
+    "name": "jadwigo/taxonomylist",
     "description": "An extension that adds a twig tag for Taxonomy Listings.",
     "type": "bolt-extension",
     "keywords": [
