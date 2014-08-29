@@ -25,10 +25,5 @@
         "psr-4" : {
             "Bolt\\Extension\\Jadwigo\\TaxonomyList\\" : ""
         }
-    },
-    "extra" : {
-        "branch-alias" : {
-            "dev-master" : "1.0.*"
-        }
     }
 }
