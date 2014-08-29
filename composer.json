@@ -1,0 +1,34 @@
+{
+    "name": "bolt/taxonomylist",
+    "description": "An extension that adds a twig tag for Taxonomy Listings.",
+    "type": "bolt-extension",
+    "keywords": [
+        "taxonomy",
+        "listing",
+        "category",
+        "tags"
+    ],
+    "require": {
+        "bolt/bolt": ">=2.0.0,<3.0.0"
+    },
+    "authors": [
+        {
+            "name": "Lodewijk Evers",
+            "email": "lodewijk@twokings.nl",
+            "homepage": "https://github.com/jadwigo"
+        }
+    ],
+    "autoload": {
+        "files": [
+            "init.php"
+        ],
+        "psr-4" : {
+            "Bolt\\Extension\\Jadwigo\\TaxonomyList\\" : ""
+        }
+    },
+    "extra" : {
+        "branch-alias" : {
+            "dev-master" : "1.0.*"
+        }
+    }
+}

@@ -1,7 +1,7 @@
 <?php
 // Sitemap Extension for Bolt, by Bob den Otter
 
-namespace TaxonomyList;
+namespace Bolt\Extension\Jadwigo\TaxonomyList;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -9,46 +9,32 @@ use Bolt\Extensions\Snippets\Location as SnippetLocation;
 
 class Extension extends \Bolt\BaseExtension
 {
-
-
+    const NAME = 'TaxonomyList';
     /**
-     * Info block for Sitemap Extension.
+     * Provide default Extension Name
      */
-    function info()
+
+    public function getName()
     {
-
-        $data = array(
-            'name' => "TaxonomyList",
-            'description' => "An extension that adds a twig tag for Taxonomy Listings.",
-            'author' => "Lodewijk Evers",
-            'link' => "http://bolt.cm",
-            'version' => "0.2",
-            'required_bolt_version' => "1.6.5",
-            'highest_bolt_version' => "1.6.5",
-            'type' => "General",
-            'first_releasedate' => "2014-06-06",
-            'latest_releasedate' => "2014-06-19",
-            'dependencies' => "",
-            'priority' => 10
-        );
-
-        return $data;
-
+        return Extension::NAME;
     }
 
     /**
      * Initialize TaxonomyList. Called during bootstrap phase.
      */
-    function initialize()
+    public function initialize()
     {
-        if (empty($this->config['default_taxonomy'])) {
-            $this->config['default_taxonomy'] = 'tags';
+        if ($this->app['config']->getWhichEnd() == 'frontend') {
+            // Add Twig functions
+            if (empty($this->config['default_taxonomy'])) {
+                $this->config['default_taxonomy'] = 'tags';
+            }
+
+            // Set up the routes for the sitemap..
+            $this->app->match("/taxonomies", array($this, 'taxonomies'));
+
+            $this->addTwigFunction('taxonomylist', 'twigTaxonomyList');
         }
-
-        // Set up the routes for the sitemap..
-        $this->app->match("/taxonomies", array($this, 'taxonomies'));
-
-        $this->addTwigFunction('taxonomylist', 'twigTaxonomyList');
     }
 
 
@@ -224,4 +210,3 @@ class Extension extends \Bolt\BaseExtension
         return null;
     }
 }
-
