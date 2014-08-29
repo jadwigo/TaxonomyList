@@ -1,5 +1,5 @@
 <?php
-// Sitemap Extension for Bolt, by Bob den Otter
+// Taxonomy listing Extension for Bolt, by Lodewijk Evers
 
 namespace Bolt\Extension\Jadwigo\TaxonomyList;
 
