@@ -77,12 +77,12 @@ class Extension extends \Bolt\BaseExtension
 
         if(array_key_exists($name, $taxonomy)) {
             $named = $taxonomy[$name];
-            if($params != false) {
+            if($params != false || $named['behaves_like']=='tags') {
                 $named = $this->getFullTaxonomy($name, $taxonomy, $params);
             }
+
             if(array_key_exists('options', $named)) {
                 // \Dumper::dump($named);
-
                 foreach($named['options'] as $slug => $item) {
 
                     if(is_array($item) && $item['name']) {
@@ -91,6 +91,10 @@ class Extension extends \Bolt\BaseExtension
                     } else {
                         $catname = $item;
                         $itemcount = null;
+                        $item = array(
+                            'name' => $catname,
+                            'count' => null
+                        );
                     }
                     $itemlink = $this->app['paths']['root'].$name .'/'.$slug;
 
@@ -100,7 +104,7 @@ class Extension extends \Bolt\BaseExtension
                         'link' => $itemlink,
                         'count' => $itemcount,
                     );
-                    if($item['weight']>=0) {
+                    if(array_key_exists('weight', $item) && $item['weight']>=0) {
                         $options[$slug]['weight'] = $item['weight'];
                         $options[$slug]['weightclass'] = $item['weightclass'];
                     }
