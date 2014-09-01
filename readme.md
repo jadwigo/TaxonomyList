@@ -16,6 +16,8 @@ The quick lookup only reads the taxonomy config and does not count items in the 
     {% endfor %}
     </ul>
 
+If your taxonomy behaves like a `tags` categroy, there will automatically be a full lookup - because the individual tags are not visible in the config file.
+
 The full lookup counts all items in the database for each category and returns this in ``{{ item.count }}``. Usage with full lookup:
 
     {% set list = taxonomylist('categories', true) %}
