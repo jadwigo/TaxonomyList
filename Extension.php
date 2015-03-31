@@ -148,7 +148,7 @@ class Extension extends \Bolt\BaseExtension
 
             // the normal query
             $query = sprintf(
-                "SELECT COUNT(name) as count, slug, name FROM %s WHERE taxonomytype IN ('%s') GROUP BY name ORDER BY %s",
+                "SELECT COUNT(name) as count, slug, name FROM %s WHERE taxonomytype IN ('%s') GROUP BY name,slug,sortorder ORDER BY %s",
                 $tablename,
                 $name,
                 $sortorder
