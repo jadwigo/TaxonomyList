@@ -29,9 +29,13 @@ class Extension extends \Bolt\BaseExtension
             if (empty($this->config['default_taxonomy'])) {
                 $this->config['default_taxonomy'] = 'tags';
             }
+            
+            if (empty($this->config['route_path'])) {
+                $this->config['route_path'] = '/taxonomies';
+            }
 
             // Set up the routes for the sitemap..
-            $this->app->match("/taxonomies", array($this, 'taxonomies'));
+            $this->app->match($this->config['route_path'], array($this, 'taxonomies'));
 
             $this->addTwigFunction('taxonomylist', 'twigTaxonomyList');
         }
