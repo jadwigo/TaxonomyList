@@ -3,8 +3,11 @@ TaxonomyList
 
 This extension adds a twig tag for Taxonomy Listings.
 
+You can use this extension to create category listings and tagclouds.
+
 The quick lookup only reads the taxonomy config and does not count items in the database. Usage with quick lookup:
 
+```twig
     {% set list = taxonomylist('categories') %}
     <ul>
     {% for item in list %}
@@ -15,11 +18,13 @@ The quick lookup only reads the taxonomy config and does not count items in the 
         </li>
     {% endfor %}
     </ul>
+```
 
 If your taxonomy behaves like a `tags` category, there will automatically be a full lookup - because the individual tags are not visible in the config file.
 
 The full lookup counts all items in the database for each category and returns this in ``{{ item.count }}``. Usage with full lookup:
 
+```twig
     {% set list = taxonomylist('categories', true) %}
     <ul>
     {% for item in list %}
@@ -31,9 +36,11 @@ The full lookup counts all items in the database for each category and returns t
         </li>
     {% endfor %}
     </ul>
+```
 
-Usage with limit and weight in a full lookup (it does not make sense to do a quick lookup with weighted tags, or limits):
+A tagcloud, usage with limit and weight in a full lookup (it does not make sense to do a quick lookup with weighted tags, or limits):
 
+```twig
     {% set list = taxonomylist('categories', { 'limit': 10, 'weighted': true } ) %}
     <nav class="tags">
     {% for item in list %}
@@ -43,6 +50,7 @@ Usage with limit and weight in a full lookup (it does not make sense to do a qui
             </a>
     {% endfor %}
     </nav>
+```
 
 Weighted will return the tags with the most matches first, unweighted will return the tags in the original sortorder. Taxonomy terms without any records in the database will not be returned.
 
