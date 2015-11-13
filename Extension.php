@@ -185,7 +185,10 @@ class Extension extends \Bolt\BaseExtension
                 // return only rows with results
                 $populatedrows = array();
                 foreach($rows as $row) {
-                    $row['weightpercent'] = ($row['count'] - $named['mincount']) / ($named['maxcount'] - $named['mincount']);
+                    $row['weightpercent'] = 1; // everything is all
+                    if($named['maxcount'] != $named['mincount']) { // prevent divide by zero
+                        $row['weightpercent'] = ($row['count'] - $named['mincount']) / ($named['maxcount'] - $named['mincount']);
+                    }
                     $row['weight'] = round($row['weightpercent'] * 100);
 
                     if($row['weight']<=20) {
