@@ -23,12 +23,14 @@ The quick lookup only reads the taxonomy config and does not count items in the 
     </ul>
 ```
 
-Tags lookup
------------
+Tags lookup or full lookup
+--------------------------
+
+The full lookup counts all items in the database for each category and returns this in ``{{ item.count }}``.
 
 If your taxonomy behaves like a `tags` category, there will automatically be a full lookup - because the individual tags are not visible in the config file.
 
-The full lookup counts all items in the database for each category and returns this in ``{{ item.count }}``. Usage with full lookup:
+Usage with full lookup:
 
 ```twig
     {% set list = taxonomylist('categories', true) %}
@@ -44,8 +46,8 @@ The full lookup counts all items in the database for each category and returns t
     </ul>
 ```
 
-Tags lookup
------------
+Use as a Tagcloud
+-----------------
 
 A tagcloud, usage with limit and weight in a full lookup (it does not make sense to do a quick lookup with weighted tags, or limits):
 
@@ -70,7 +72,7 @@ The ``{{ item.weightclass }}`` is one of xl, x, m, s, xs.
 Only published items
 --------------------
 
-If you only want to count the published items you will need to know the content type as well as the taxonomy. 
+If you only want to count the published items you will need to know the content type as well as the taxonomy. The rest of the behaviour is the same as the other options.
 
 ```twig
     {% set list = taxonomylist('categories', { 'limit': 10, 'weighted': true, 'contenttype': 'pages' } ) %}
