@@ -75,7 +75,7 @@ class Extension extends \Bolt\BaseExtension
                 $name = "tags";
             }
         }
-        // \Dumper::dump($this->app['paths']);
+        // dump($this->app['paths']);
 
         $taxonomy = $this->app['config']->get('taxonomy');
 
@@ -86,7 +86,7 @@ class Extension extends \Bolt\BaseExtension
             }
 
             if(array_key_exists('options', $named)) {
-                // \Dumper::dump($named);
+                // dump($named);
                 foreach($named['options'] as $slug => $item) {
 
                     if(is_array($item) && $item['name']) {
@@ -113,8 +113,8 @@ class Extension extends \Bolt\BaseExtension
                         $options[$slug]['weightclass'] = $item['weightclass'];
                     }
                 }
-                // \Dumper::dump($named);
-                // \Dumper::dump($options);
+                // dump($named);
+                // dump($options);
                 return $options;
             }
         }
@@ -132,12 +132,17 @@ class Extension extends \Bolt\BaseExtension
             $named = $taxonomy[$name];
 
             // default params
-            $limit = $weighted = false;
+            $limit = $weighted = $contenttype = false;
             if(isset($params['limit']) && is_numeric($params['limit'])) {
                 $limit = $params['limit'];
             }
+
             if(isset($params['weighted']) && $params['weighted']==true) {
                 $weighted = true;
+            }
+
+            if(isset($params['contenttype']) && $params['contenttype']!="") {
+                $contenttype = $params['contenttype'];
             }
 
             $prefix = $this->app['config']->get('general/database/prefix', 'bolt_');
@@ -150,21 +155,48 @@ class Extension extends \Bolt\BaseExtension
                 $sortorder = 'sortorder ASC';
             }
 
-            // the normal query
-            $query = sprintf(
-                "SELECT COUNT(name) as count, slug, name FROM %s WHERE taxonomytype IN ('%s') GROUP BY name,slug,sortorder ORDER BY %s",
-                $tablename,
-                $name,
-                $sortorder
-            );
+            if(!$contenttype) {
+                // the normal query
+                $query = sprintf(
+                    "SELECT COUNT(name) as count, slug, name 
+                        FROM %s
+                        WHERE taxonomytype IN ('%s')
+                        GROUP BY name, slug, sortorder 
+                        ORDER BY %s",
+                    $tablename,
+                    $name,
+                    $sortorder
+                );
+            } elseif($contenttype!=false) {
+                // TODO: get the contenttype table from the contenttype slug instead of guessing
+                $contenttype_table = $prefix . $contenttype;
+                // the normal query with only published items
+                $query = sprintf(
+                    "SELECT COUNT(name) as count, slug, name 
+                        FROM %s
+                        WHERE taxonomytype = '%s'
+                            AND contenttype = '%s'
+                            AND content_id IN (SELECT id FROM %s WHERE status = 'published' AND id = content_id)
+                        GROUP BY name, slug, sortorder 
+                        ORDER BY %s",
+                    $tablename,
+                    $name,
+                    $contenttype,
+                    $contenttype_table,
+                    $sortorder
+                );
+            }
 
             // append limit to query the parameter is set
             if($limit) {
                 $query .= sprintf(' LIMIT 0, %d', $limit);
             }
 
+            // dump($query);
+
             // fetch results from db
             $rows = $this->app['db']->executeQuery( $query )->fetchAll();
+            // dump($rows);
 
             if($rows && ($weighted || $limit)) {
                 // find the max / min for the results
@@ -214,7 +246,7 @@ class Extension extends \Bolt\BaseExtension
                 }
             }
 
-            // \Dumper::dump($named);
+            // dump($named);
             return $named;
         }
 
