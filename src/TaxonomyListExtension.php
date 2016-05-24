@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Bolt\Extensions\Snippets\Location as SnippetLocation;
 
-class Extension extends \Bolt\BaseExtension
+class TaxonomyListExtension extends \Bolt\BaseExtension
 {
     const NAME = 'TaxonomyList';
     /**
