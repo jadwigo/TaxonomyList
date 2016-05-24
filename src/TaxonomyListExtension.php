@@ -5,44 +5,37 @@ namespace Bolt\Extension\Jadwigo\TaxonomyList;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Silex\ControllerCollection;
+use Bolt\Extension\SimpleExtension;
+use Silex\Application;
 use Bolt\Extensions\Snippets\Location as SnippetLocation;
 
-class TaxonomyListExtension extends \Bolt\BaseExtension
+class TaxonomyListExtension extends SimpleExtension
 {
-    const NAME = 'TaxonomyList';
-    /**
-     * Provide default Extension Name
-     */
-
-    public function getName()
+    protected function registerFrontendRoutes(ControllerCollection $collection)
     {
-        return Extension::NAME;
+        $config = $this->getConfig();
+        
+        $collection->match($config['route_path'], [$this, 'taxonomies']);
     }
 
-    /**
-     * Initialize TaxonomyList. Called during bootstrap phase.
-     */
-    public function initialize()
+    protected function getDefaultConfig()
     {
-        if ($this->app['config']->getWhichEnd() == 'frontend') {
-            // Add Twig functions
-            if (empty($this->config['default_taxonomy'])) {
-                $this->config['default_taxonomy'] = 'tags';
-            }
-            
-            if (empty($this->config['route_path'])) {
-                $this->config['route_path'] = '/taxonomies';
-            }
-
-            // Set up the routes for the sitemap..
-            $this->app->match($this->config['route_path'], array($this, 'taxonomies'));
-
-            $this->addTwigFunction('taxonomylist', 'twigTaxonomyList');
-        }
+        return [
+            'template' => 'taxonomylist.twig',
+            'default_taxonomy' => 'tags',
+            'route_path' => '/taxonomies'
+        ];
     }
 
+    protected function registerTwigFunctions()
+    {
+        return [
+            'taxonomylist' => 'twigTaxonomyList'
+        ];
+    }
 
-    public function taxonomies($xml = false)
+    public function taxonomies(Application $app, Request $request, $xml = false)
     {
         $taxonomy = $this->app['config']->get('taxonomy');
         $taxonomies = array_keys($taxonomy);
