@@ -12,8 +12,10 @@
         "tagclouds"
     ],
     "require": {
-        "bolt/bolt": ">=2.0.0,<3.0.0"
+        "bolt/bolt": "^3.0"
     },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "authors": [
         {
             "name": "Lodewijk Evers",
@@ -22,16 +24,11 @@
         }
     ],
     "autoload": {
-        "files": [
-            "init.php"
-        ],
         "psr-4" : {
-            "Bolt\\Extension\\Jadwigo\\TaxonomyList\\" : ""
+            "Bolt\\Extension\\Jadwigo\\TaxonomyList\\" : "src"
         }
     },
     "extra": {
-        "branch-alias": {
-            "dev-master": "2.0.*"
-        }
+        "bolt-class": "Bolt\\Extension\\Jadwigo\\TaxonomyList\\TaxonomyListExtension"
     }
 }
