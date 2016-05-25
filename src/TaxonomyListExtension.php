@@ -11,6 +11,10 @@ use Silex\Application;
 
 class TaxonomyListExtension extends SimpleExtension
 {
+
+    /**
+     * @param ControllerCollection $collection
+     */
     protected function registerFrontendRoutes(ControllerCollection $collection)
     {
         $config = $this->getConfig();
@@ -18,6 +22,9 @@ class TaxonomyListExtension extends SimpleExtension
         $collection->match($config['route_path'], [$this, 'taxonomies']);
     }
 
+    /**
+     * @return array
+     */
     protected function getDefaultConfig()
     {
         return [
@@ -27,6 +34,9 @@ class TaxonomyListExtension extends SimpleExtension
         ];
     }
 
+    /**
+     * @return array
+     */
     protected function registerTwigFunctions()
     {
         $app = $this->getContainer();
@@ -39,7 +49,9 @@ class TaxonomyListExtension extends SimpleExtension
         ];
     }
 
-
+    /**
+     * @param Application $app
+     */
     protected function registerServices(Application $app)
     {
         $app['taxonomylist.twig'] = $app->share(
@@ -51,6 +63,11 @@ class TaxonomyListExtension extends SimpleExtension
         );
     }
 
+    /**
+     * @param Application $app
+     * @param Request $request
+     * @return Response
+     */
     public function taxonomies(Application $app, Request $request)
     {
         $config = $this->getConfig();

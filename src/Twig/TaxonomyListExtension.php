@@ -21,11 +21,21 @@ class TaxonomyListExtension
 
     /**
      * Return an array with items in a taxonomy
+     *
+     * @param bool $name
+     * @param bool $params
+     * @return null
      */
     public function twigTaxonomyList($name = false, $params = false)
     {
         // if $name isn't set, use the one from the config.yml. Unless that's empty too, then use "tags".
-        $name = $this->config['default_taxonomy'];
+        if (empty($name)) {
+            if (!empty($this->config['default_taxonomy'])) {
+                $name = $this->config['default_taxonomy'];
+            } else {
+                $name = "tags";
+            }
+        }
 
         $taxonomy = $this->app['config']->get('taxonomy');
 
@@ -70,6 +80,12 @@ class TaxonomyListExtension
 
     /**
      * Get the full taxonomy data from the database, count all occurences of a certain taxonomy name
+     *
+     * @param null $name
+     * @param null $taxonomy
+     * @param null $params
+     * @return null
+     * @throws \Doctrine\DBAL\DBALException
      */
     protected function getFullTaxonomy($name = null, $taxonomy = null, $params = null)
     {
