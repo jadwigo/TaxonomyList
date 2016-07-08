@@ -156,6 +156,13 @@ class TaxonomyListExtension
             // fetch results from db
             $rows = $this->app['db']->executeQuery($query)->fetchAll();
 
+            // Local sort
+            if ($rows) {
+                usort($rows, function($a, $b) {
+                    return strcoll($a['name'], $b['name']);
+                });
+            }
+
             if ($rows && ($weighted || $limit)) {
                 // find the max / min for the results
                 $named['maxcount'] = 0;
