@@ -58,7 +58,7 @@ class TaxonomyListExtension
                             'count' => null
                         );
                     }
-                    $itemlink = $this->app['paths']['root'].$name .'/'.$slug;
+                    $itemlink = $this->app['url_generator']->generate('taxonomylink', ['taxonomytype' => $name, 'slug' => $slug]);
 
                     $options[$slug] = array(
                         'slug' => $slug,
@@ -119,10 +119,10 @@ class TaxonomyListExtension
             if (!$contenttype) {
                 // the normal query
                 $query = sprintf(
-                    "SELECT COUNT(name) as count, slug, name 
+                    "SELECT COUNT(name) as count, slug, name
                             FROM %s
                             WHERE taxonomytype IN ('%s')
-                            GROUP BY name, slug, sortorder 
+                            GROUP BY name, slug, sortorder
                             ORDER BY %s",
                     $tablename,
                     $name,
@@ -133,12 +133,12 @@ class TaxonomyListExtension
                 $contenttype_table = $prefix . $contenttype;
                 // the normal query with only published items
                 $query = sprintf(
-                    "SELECT COUNT(name) as count, slug, name 
+                    "SELECT COUNT(name) as count, slug, name
                             FROM %s
                             WHERE taxonomytype = '%s'
                                 AND contenttype = '%s'
                                 AND content_id IN (SELECT id FROM %s WHERE status = 'published' AND id = content_id)
-                            GROUP BY name, slug, sortorder 
+                            GROUP BY name, slug, sortorder
                             ORDER BY %s",
                     $tablename,
                     $name,
