@@ -159,7 +159,7 @@ class TaxonomyListExtension
             if ($rows && ($weighted || $limit)) {
                 // find the max / min for the results
                 $named['maxcount'] = 0;
-                $named['number_of_tags'] = count($named['options']);
+                $named['number_of_tags'] = !empty($named['options']) ? count($named['options']) : 0;
                 foreach ($rows as $row) {
                     if ($row['count']>=$named['maxcount']) {
                         $named['maxcount']= $row['count'];
