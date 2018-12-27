@@ -83,7 +83,7 @@ _This might be a problem if you share taxonomies with more contentypes._
 Override order
 --------------
 
-If you prefer to specify the order of the tags. This option will be ignoref if weighted: is set to true.
+If you prefer to specify the order of the tags. This option will be ignored if `weighted` is set to true.
 
 ```twig
     {% set list = taxonomylist('categories', { 'orderby': 'name' } ) %}
