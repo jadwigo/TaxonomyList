@@ -58,7 +58,7 @@ class TaxonomyListExtension
                             'count' => null
                         );
                     }
-                    $itemlink = $this->app['paths']['root'].$name .'/'.$slug;
+                    $itemlink = $this->app['url_generator']->generate('taxonomylink', ['taxonomytype' => $name, 'slug' => $slug]);
 
                     $options[$slug] = array(
                         'slug' => $slug,
@@ -93,13 +93,17 @@ class TaxonomyListExtension
             $named = $taxonomy[$name];
 
             // default params
-            $limit = $weighted = $contenttype = false;
+            $limit = $weighted = $orderby = $contenttype = false;
             if (isset($params['limit']) && is_numeric($params['limit'])) {
                 $limit = $params['limit'];
             }
 
             if (isset($params['weighted']) && $params['weighted']==true) {
                 $weighted = true;
+            }
+
+            if (isset($params['orderby']) && $params['orderby']==true) {
+                $orderby = $params['orderby'];
             }
 
             if (isset($params['contenttype']) && $params['contenttype']!="") {
@@ -112,6 +116,12 @@ class TaxonomyListExtension
             // type of sort depending on params
             if ($weighted) {
                 $sortorder = 'count DESC';
+            } elseif ($orderby !== false) {
+                if (substr($orderby, 0, 1) == "-") {
+                    $sortorder = substr($orderby, 1)." DESC";
+                } else {
+                    $sortorder = $orderby." ASC";
+                }
             } else {
                 $sortorder = 'sortorder ASC';
             }
@@ -119,10 +129,10 @@ class TaxonomyListExtension
             if (!$contenttype) {
                 // the normal query
                 $query = sprintf(
-                    "SELECT COUNT(name) as count, slug, name 
+                    "SELECT COUNT(name) as count, slug, name
                             FROM %s
                             WHERE taxonomytype IN ('%s')
-                            GROUP BY name, slug, sortorder 
+                            GROUP BY name, slug, sortorder
                             ORDER BY %s",
                     $tablename,
                     $name,
@@ -133,12 +143,12 @@ class TaxonomyListExtension
                 $contenttype_table = $prefix . $contenttype;
                 // the normal query with only published items
                 $query = sprintf(
-                    "SELECT COUNT(name) as count, slug, name 
+                    "SELECT COUNT(name) as count, slug, name
                             FROM %s
                             WHERE taxonomytype = '%s'
                                 AND contenttype = '%s'
                                 AND content_id IN (SELECT id FROM %s WHERE status = 'published' AND id = content_id)
-                            GROUP BY name, slug, sortorder 
+                            GROUP BY name, slug, sortorder
                             ORDER BY %s",
                     $tablename,
                     $name,
@@ -159,7 +169,7 @@ class TaxonomyListExtension
             if ($rows && ($weighted || $limit)) {
                 // find the max / min for the results
                 $named['maxcount'] = 0;
-                $named['number_of_tags'] = count($named['options']);
+                $named['number_of_tags'] = !empty($named['options']) ? count($named['options']) : 0;
                 foreach ($rows as $row) {
                     if ($row['count']>=$named['maxcount']) {
                         $named['maxcount']= $row['count'];
