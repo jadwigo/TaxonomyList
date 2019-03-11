@@ -202,15 +202,19 @@ class TaxonomyListExtension
                     } else {
                         $row['weightclass'] = 'xl';
                     }
-
-                    $populatedrows[$row['slug']] = $row;
+                    
+                    if ($row['slug']) {
+                        $populatedrows[$row['slug']] = $row;
+                    }
                 }
                 $named['options'] = $populatedrows;
             } elseif ($rows) {
                 // return all rows - so add the count to all existing rows
                 // weight is useless here
                 foreach ($rows as $row) {
-                    $named['options'][$row['slug']] = $row;
+                    if ($row['slug']) {
+                        $named['options'][$row['slug']] = $row;
+                    }
                 }
             }
 
