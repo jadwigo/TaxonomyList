@@ -103,13 +103,17 @@ class TaxonomyListExtension
             $named = $taxonomy[$name];
 
             // default params
-            $limit = $weighted = $contenttype = false;
+            $limit = $weighted = $orderby = $contenttype = false;
             if (isset($params['limit']) && is_numeric($params['limit'])) {
                 $limit = $params['limit'];
             }
 
             if (isset($params['weighted']) && $params['weighted']==true) {
                 $weighted = true;
+            }
+
+            if (isset($params['orderby']) && $params['orderby']==true) {
+                $orderby = $params['orderby'];
             }
 
             if (isset($params['contenttype']) && $params['contenttype']!="") {
@@ -122,6 +126,12 @@ class TaxonomyListExtension
             // type of sort depending on params
             if ($weighted) {
                 $sortorder = 'count DESC';
+            } elseif ($orderby !== false) {
+                if (substr($orderby, 0, 1) == "-") {
+                    $sortorder = substr($orderby, 1)." DESC";
+                } else {
+                    $sortorder = $orderby." ASC";
+                }
             } else {
                 $sortorder = 'sortorder ASC';
             }
@@ -202,15 +212,19 @@ class TaxonomyListExtension
                     } else {
                         $row['weightclass'] = 'xl';
                     }
-
-                    $populatedrows[$row['slug']] = $row;
+                    
+                    if ($row['slug']) {
+                        $populatedrows[$row['slug']] = $row;
+                    }
                 }
                 $named['options'] = $populatedrows;
             } elseif ($rows) {
                 // return all rows - so add the count to all existing rows
                 // weight is useless here
                 foreach ($rows as $row) {
-                    $named['options'][$row['slug']] = $row;
+                    if ($row['slug']) {
+                        $named['options'][$row['slug']] = $row;
+                    }
                 }
             }
 

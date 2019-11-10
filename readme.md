@@ -79,3 +79,18 @@ If you only want to count the published items you will need to know the content 
 ```
 
 _This might be a problem if you share taxonomies with more contentypes._
+
+Override order
+--------------
+
+If you prefer to specify the order of the tags. This option will be ignored if `weighted` is set to true.
+
+```twig
+    {% set list = taxonomylist('categories', { 'orderby': 'name' } ) %}
+```
+
+or descending order
+
+```twig
+    {% set list = taxonomylist('categories', { 'orderby': '-name' } ) %}
+```
