@@ -70,6 +70,16 @@ class TaxonomyListExtension
                         $options[$slug]['weight'] = $item['weight'];
                         $options[$slug]['weightclass'] = $item['weightclass'];
                     }
+                    if (array_key_exists('posts', $item)) {
+                        $options[$slug]['posts'] = array();
+                        foreach( explode( ";;;", $item['posts'] ) as $post ){
+                            $post_attrs = explode( ":::", $post );
+                            array_push( $options[$slug]['posts'], array(
+                                'type' => $post_attrs[0],
+                                'id' => $post_attrs[1],
+                            ) );
+                        }
+                    }
                 }
                 return $options;
             }
@@ -129,7 +139,7 @@ class TaxonomyListExtension
             if (!$contenttype) {
                 // the normal query
                 $query = sprintf(
-                    "SELECT COUNT(name) as count, slug, name
+                    "SELECT COUNT(name) as count, slug, name, GROUP_CONCAT( contenttype || ':::' || content_id, ';;;' ) as posts
                             FROM %s
                             WHERE taxonomytype IN ('%s')
                             GROUP BY name, slug, sortorder
@@ -143,7 +153,7 @@ class TaxonomyListExtension
                 $contenttype_table = $prefix . $contenttype;
                 // the normal query with only published items
                 $query = sprintf(
-                    "SELECT COUNT(name) as count, slug, name
+                    "SELECT COUNT(name) as count, slug, name, GROUP_CONCAT( contenttype || ':::' || content_id, ';;;' ) as posts
                             FROM %s
                             WHERE taxonomytype = '%s'
                                 AND contenttype = '%s'
